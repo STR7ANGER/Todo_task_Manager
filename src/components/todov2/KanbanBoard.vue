@@ -48,6 +48,7 @@ export default Vue.extend({
 .kanban-board {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
+  gap: 18px;
+  padding: 8px 0;
 }
 </style>

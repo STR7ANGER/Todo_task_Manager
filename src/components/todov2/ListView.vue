@@ -1,63 +1,75 @@
 <template>
   <div class="list-view">
-    <div class="list-controls">
-      <div class="filter-group">
-        <label>
-          Priority
-          <select v-model="selectedPriority">
-            <option value="all">All</option>
-            <option v-for="priority in priorities" :key="priority" :value="priority">
-              {{ priority }}
-            </option>
-          </select>
-        </label>
-        <label>
-          Assignee
-          <select v-model="selectedAssignee">
-            <option value="all">All</option>
-            <option v-for="assignee in assignees" :key="assignee" :value="assignee">
-              {{ assignee }}
-            </option>
-          </select>
-        </label>
-      </div>
-      <div class="filter-group">
-        <label>
-          Sort By
-          <select v-model="sortKey">
-            <option value="dueDate">Due Date</option>
-            <option value="priority">Priority</option>
-          </select>
-        </label>
+    <div class="list-head">
+      <div>
+        <h2>Daily Back-End Task</h2>
+        <div class="head-meta">
+          <span><svg viewBox="0 0 24 24" class="icon"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.31 0-6 1.34-6 3v3h12v-3c0-1.66-2.69-3-6-3z" fill="currentColor"/></svg> Developer Team</span>
+          <span><svg viewBox="0 0 24 24" class="icon"><path d="M12 2l2.4 6h6.6l-5.3 3.9 2 6.1-5.7-4.1-5.7 4.1 2-6.1L3 8h6.6L12 2z" fill="currentColor"/></svg> Important</span>
+          <span><svg viewBox="0 0 24 24" class="icon"><path d="M7 5h10v2H7V5zm0 6h10v2H7v-2zm0 6h6v2H7v-2z" fill="currentColor"/></svg> 11 Task</span>
+        </div>
       </div>
     </div>
 
-    <div class="list-table">
-      <div class="list-row header">
-        <span>Title</span>
-        <span>Priority</span>
-        <span>Due Date</span>
-        <span>Assignee</span>
-        <span>Status</span>
-        <span>Actions</span>
+    <div
+      v-for="section in sections"
+      :key="section.status"
+      class="status-section"
+    >
+      <div class="section-header">
+        <span class="section-pill" :class="section.tone">
+          {{ section.label }}
+        </span>
+        <span class="section-count">{{ section.todos.length }}</span>
       </div>
-      <div v-for="todo in sortedTodos" :key="todo.id" class="list-row">
-        <span class="title">
-          {{ todo.title }}
-          <small>{{ todo.description }}</small>
-        </span>
-        <span class="badge" :class="`priority-${todo.priority}`">
-          {{ todo.priority }}
-        </span>
-        <span :class="{ overdue: manager.isOverdue(todo) }">
-          {{ todo.dueDate }}
-        </span>
-        <span>{{ todo.assignee }}</span>
-        <span class="status">{{ todo.status }}</span>
-        <span class="actions">
-          <button type="button" @click="$emit('edit', todo)">Edit</button>
-          <button type="button" class="danger" @click="$emit('delete', todo)">Delete</button>
-        </span>
+
+      <div class="list-table">
+        <div class="list-row header">
+          <span class="check-col">
+            <input
+              type="checkbox"
+              :checked="isAllSelected(section.todos)"
+              @change="toggleSection(section.todos, $event)"
+            />
+          </span>
+          <span>Task Name</span>
+          <span>Descriptions</span>
+          <span>People</span>
+          <span>Type</span>
+          <span>Timeline Date</span>
+          <span>Priority</span>
+          <span></span>
+        </div>
+        <div v-for="todo in section.todos" :key="todo.id" class="list-row">
+          <span class="check-col">
+            <input
+              type="checkbox"
+              :checked="selectedIds.includes(todo.id)"
+              @change="toggleRow(todo.id, $event)"
+            />
+          </span>
+          <span class="task-name">
+            {{ todo.title }}
+          </span>
+          <span class="desc">{{ todo.description }}</span>
+          <span class="people">
+            <span class="avatar">{{ manager.getAssigneeInitials(todo.assignee) }}</span>
+          </span>
+          <span class="type" :class="manager.getTypeTone(todo)">{{ manager.getTypeLabel(todo) }}</span>
+          <span class="timeline">{{ manager.getTimelineLabel(todo) }}</span>
+          <span class="priority" :class="manager.getPriorityTone(todo.priority)">
+            {{ manager.getPriorityLabel(todo.priority) }}
+          </span>
+          <span class="row-actions">
+            <div class="menu-wrapper">
+              <button type="button" class="ghost-btn">⋯</button>
+              <div class="menu">
+                <button type="button" class="menu-item" @click="$emit('edit', todo)">Edit</button>
+                <button type="button" class="menu-item danger" @click="$emit('delete', todo)">Delete</button>
+              </div>
+            </div>
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -69,7 +81,6 @@ import TodoManager from '@/BLL/todoV2/TodoManager'
 import { Priority, Todo } from '@/BLL/todoV2/types'
 
 type SortKey = 'dueDate' | 'priority'
-
 type PriorityFilter = Priority | 'all'
 type AssigneeFilter = string | 'all'
 
@@ -80,25 +91,23 @@ export default Vue.extend({
       type: Object as PropType<TodoManager>,
       required: true,
     },
+    selectedPriority: {
+      type: String as PropType<PriorityFilter>,
+      required: true,
+    },
+    selectedAssignee: {
+      type: String as PropType<AssigneeFilter>,
+      required: true,
+    },
+    sortKey: {
+      type: String as PropType<SortKey>,
+      required: true,
+    },
   },
-  data(): {
-    selectedPriority: PriorityFilter
-    selectedAssignee: AssigneeFilter
-    sortKey: SortKey
-  } {
-    return {
-      selectedPriority: 'all',
-      selectedAssignee: 'all',
-      sortKey: 'dueDate',
-    }
+  data(): { selectedIds: string[] } {
+    return { selectedIds: [] }
   },
   computed: {
-    assignees(): string[] {
-      return this.manager.getAssignees()
-    },
-    priorities(): Priority[] {
-      return ['low', 'medium', 'high']
-    },
     filteredTodos(): Todo[] {
       const filter = {
         priority: this.selectedPriority === 'all' ? undefined : this.selectedPriority,
@@ -106,8 +115,56 @@ export default Vue.extend({
       }
       return this.manager.filterTodos(filter)
     },
-    sortedTodos(): Todo[] {
-      return this.manager.sortTodos(this.filteredTodos, this.sortKey)
+    sections(): Array<{
+      status: 'todo' | 'in-progress' | 'done'
+      label: string
+      tone: string
+      todos: Todo[]
+    }> {
+      const base = [
+        { status: 'todo', label: 'Not Started' },
+        { status: 'in-progress', label: 'In Progress' },
+        { status: 'done', label: 'Done' },
+      ] as const
+
+      return base.map((section) => {
+        const todos = this.filteredTodos.filter((todo) => todo.status === section.status)
+        const sorted = this.manager.sortTodos(todos, this.sortKey)
+        return {
+          status: section.status,
+          label: section.label,
+          tone: `tone-${this.manager.getStatusTone(section.status)}`,
+          todos: sorted,
+        }
+      })
+    },
+  },
+  methods: {
+    toggleRow(id: string, event: Event): void {
+      const checked = (event.target as HTMLInputElement).checked
+      if (checked) {
+        if (!this.selectedIds.includes(id)) {
+          this.selectedIds = [...this.selectedIds, id]
+        }
+      } else {
+        this.selectedIds = this.selectedIds.filter((item) => item !== id)
+      }
+    },
+    toggleSection(todos: Todo[], event: Event): void {
+      const checked = (event.target as HTMLInputElement).checked
+      const ids = todos.map((todo) => todo.id)
+      if (checked) {
+        const merged = new Set([...this.selectedIds, ...ids])
+        this.selectedIds = Array.from(merged)
+      } else {
+        this.selectedIds = this.selectedIds.filter((id) => !ids.includes(id))
+      }
+    },
+    isAllSelected(todos: Todo[]): boolean {
+      if (todos.length === 0) {
+        return false
+      }
+      return todos.every((todo) => this.selectedIds.includes(todo.id))
     },
   },
 })
@@ -117,137 +174,238 @@ export default Vue.extend({
 .list-view {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-.list-controls {
+.list-head {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 16px;
 }
 
-.filter-group {
-  display: flex;
-  gap: 12px;
+.list-head h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ink-900);
 }
 
-label {
+.head-meta {
   display: flex;
-  flex-direction: column;
+  gap: 16px;
+  color: var(--ink-500);
   font-size: 12px;
-  color: #5b5f6d;
+  margin-top: 6px;
+}
+
+.head-meta span {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
 }
 
-select {
-  border: 1px solid #e2e5ec;
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-pill {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.tone-purple {
+  background: var(--purple-100);
+  color: var(--purple-600);
+}
+
+.tone-orange {
+  background: var(--orange-100);
+  color: var(--orange-600);
+}
+
+.tone-green {
+  background: var(--green-100);
+  color: var(--green-600);
+}
+
+.section-count {
+  background: var(--surface);
+  border: var(--border-soft);
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--ink-600);
 }
 
 .list-table {
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #eef0f4;
+  border: var(--border-soft);
   overflow: hidden;
 }
 
 .list-row {
   display: grid;
-  grid-template-columns: 2fr repeat(4, 1fr) 1fr;
+  grid-template-columns: 32px 1.3fr 2fr 0.8fr 0.9fr 1.2fr 0.9fr 0.8fr;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   align-items: center;
-  border-bottom: 1px solid #eef0f4;
-  font-size: 13px;
-  color: #2b2f3a;
+  border-bottom: var(--border-soft);
+  font-size: 12px;
+  color: var(--ink-700);
 }
 
 .list-row.header {
-  background: #f8f9fc;
+  background: var(--surface-muted);
   font-weight: 700;
-  font-size: 12px;
   text-transform: uppercase;
-  color: #5b5f6d;
+  color: var(--ink-500);
 }
 
 .list-row:last-child {
   border-bottom: none;
 }
 
-.title {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.task-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
 }
 
-.title small {
-  font-weight: 400;
-  color: #6d7280;
+.check-col {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.badge {
-  text-transform: capitalize;
-  font-size: 11px;
+.desc {
+  color: var(--ink-500);
+}
+
+.people .avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #ececff;
+  color: #4b3bd0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
+}
+
+.type,
+.priority {
+  font-weight: 600;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 10px;
   display: inline-flex;
   width: fit-content;
 }
 
-.priority-high {
-  background: #ffe4e8;
-  color: #c1121f;
+.type.lavender {
+  background: #efeaff;
+  color: #6a55e8;
 }
 
-.priority-medium {
-  background: #fff5d6;
-  color: #b67b00;
+.type.mint {
+  background: #e8f6f0;
+  color: #2f9c66;
 }
 
-.priority-low {
-  background: #e4f7ec;
-  color: #0f7b4a;
+.type.peach {
+  background: #fff1dc;
+  color: #d9822b;
 }
 
-.overdue {
-  color: #c1121f;
-  font-weight: 600;
+.priority.red {
+  background: var(--red-100);
+  color: var(--red-600);
 }
 
-.status {
-  text-transform: capitalize;
+.priority.yellow {
+  background: var(--yellow-100);
+  color: var(--yellow-600);
 }
 
-.actions {
+.priority.blue {
+  background: var(--blue-100);
+  color: var(--blue-600);
+}
+
+.row-actions {
   display: flex;
-  gap: 8px;
+  justify-content: flex-end;
 }
 
-.actions button {
+.ghost-btn {
   border: none;
   background: transparent;
-  font-size: 12px;
+  color: var(--ink-500);
+  font-size: 16px;
   cursor: pointer;
-  color: #2b2f3a;
 }
 
-.actions button.danger {
-  color: #c1121f;
+.menu-wrapper {
+  position: relative;
 }
 
-@media (max-width: 900px) {
-  .list-row {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
+.menu {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: var(--surface);
+  border: var(--border-soft);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: var(--shadow-soft);
+  display: none;
+  z-index: 10;
+}
 
-  .list-row.header {
-    display: none;
-  }
+.menu-wrapper:hover .menu {
+  display: block;
+}
+
+.menu-item {
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--ink-700);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.menu-item:hover {
+  background: var(--surface-muted);
+}
+
+.menu-item.danger {
+  color: var(--red-600);
+}
+
+.timeline {
+  color: var(--ink-500);
+  font-size: 11px;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
 }
 </style>

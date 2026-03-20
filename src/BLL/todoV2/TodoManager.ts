@@ -152,6 +152,88 @@ export class TodoManager {
     return { valid: Object.keys(errors).length === 0, errors }
   }
 
+  getStatusLabel(status: TodoStatus): string {
+    if (status === 'todo') {
+      return 'Not Started'
+    }
+    if (status === 'in-progress') {
+      return 'On Track'
+    }
+    return 'Complete'
+  }
+
+  getStatusTone(status: TodoStatus): 'purple' | 'orange' | 'green' {
+    if (status === 'todo') {
+      return 'purple'
+    }
+    if (status === 'in-progress') {
+      return 'orange'
+    }
+    return 'green'
+  }
+
+  getPriorityLabel(priority: Priority): string {
+    if (priority === 'high') {
+      return 'High'
+    }
+    if (priority === 'medium') {
+      return 'Medium'
+    }
+    return 'Low'
+  }
+
+  getPriorityTone(priority: Priority): 'red' | 'yellow' | 'blue' {
+    if (priority === 'high') {
+      return 'red'
+    }
+    if (priority === 'medium') {
+      return 'yellow'
+    }
+    return 'blue'
+  }
+
+  getTypeLabel(todo: Todo): 'Feature' | 'Review' | 'Bug' {
+    if (todo.priority === 'high') {
+      return 'Bug'
+    }
+    if (todo.priority === 'medium') {
+      return 'Review'
+    }
+    return 'Feature'
+  }
+
+  getTypeTone(todo: Todo): 'lavender' | 'mint' | 'peach' {
+    if (todo.priority === 'high') {
+      return 'peach'
+    }
+    if (todo.priority === 'medium') {
+      return 'lavender'
+    }
+    return 'mint'
+  }
+
+  getTimelineLabel(todo: Todo): string {
+    return `${this.formatDate(todo.createdAt)} - ${this.formatDate(todo.dueDate)}`
+  }
+
+  getMetaCounts(todo: Todo): { comments: number; links: number; checklist: string } {
+    const seed = parseInt(todo.id.replace(/\D/g, ''), 10) || 1
+    const comments = (seed % 9) + 3
+    const links = (seed % 3) + 1
+    const completed = (seed % 3) + 1
+    return { comments, links, checklist: `${completed}/3` }
+  }
+
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr)
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+    return formatter.format(date)
+  }
+
   private generateId(): string {
     const random = Math.floor(Math.random() * 10000)
     return `${Date.now()}-${random}`
