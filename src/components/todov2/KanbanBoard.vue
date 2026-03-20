@@ -6,6 +6,8 @@
       :manager="manager"
       :status="column.status"
       :title="column.title"
+      @add="$emit('add')"
+      @open="$emit('open', $event)"
       @edit="$emit('edit', $event)"
       @delete="$emit('delete', $event)"
     />

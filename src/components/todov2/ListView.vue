@@ -9,6 +9,9 @@
           <span><svg viewBox="0 0 24 24" class="icon"><path d="M7 5h10v2H7V5zm0 6h10v2H7v-2zm0 6h6v2H7v-2z" fill="currentColor"/></svg> 11 Task</span>
         </div>
       </div>
+      <button type="button" class="add-task" @click="$emit('add')">
+        + Add Task
+      </button>
     </div>
 
     <div
@@ -48,7 +51,7 @@
               @change="toggleRow(todo.id, $event)"
             />
           </span>
-          <span class="task-name">
+          <span class="task-name" @click="$emit('open', todo)">
             {{ todo.title }}
           </span>
           <span class="desc">{{ todo.description }}</span>
@@ -204,6 +207,18 @@ export default Vue.extend({
   gap: 6px;
 }
 
+.add-task {
+  border: none;
+  background: var(--purple-600);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
 
 .status-section {
   display: flex;
@@ -282,6 +297,11 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.task-name:hover {
+  text-decoration: underline;
 }
 
 .check-col {

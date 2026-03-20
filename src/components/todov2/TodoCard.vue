@@ -1,15 +1,15 @@
 <template>
-  <div class="todo-card" draggable="true" @dragstart="onDragStart">
+  <div class="todo-card" draggable="true" @dragstart="onDragStart" @click="$emit('open', todo)">
     <div class="card-header">
       <span class="status-pill" :class="statusTone">
         <span class="dot"></span>
         {{ statusLabel }}
       </span>
-      <div class="menu-wrapper">
+      <div class="menu-wrapper" @click.stop>
         <button type="button" class="ghost-btn">⋯</button>
         <div class="menu">
-          <button type="button" class="menu-item" @click="$emit('edit', todo)">Edit</button>
-          <button type="button" class="menu-item danger" @click="$emit('delete', todo)">Delete</button>
+          <button type="button" class="menu-item" @click.stop="$emit('edit', todo)">Edit</button>
+          <button type="button" class="menu-item danger" @click.stop="$emit('delete', todo)">Delete</button>
         </div>
       </div>
     </div>
@@ -30,32 +30,6 @@
         {{ manager.formatDate(todo.dueDate) }}
       </div>
       <span class="priority" :class="priorityTone">{{ priorityLabel }}</span>
-    </div>
-    <div class="footer">
-      <span class="footer-item">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-          <path
-            d="M4 4h16v12H7l-3 3V4zm2 4h12v2H6V8zm0 4h8v2H6v-2z"
-            fill="currentColor"
-          />
-        </svg>
-        {{ metaCounts.comments }} Comments
-      </span>
-      <span class="footer-item">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-          <path
-            d="M10.6 13.4a1 1 0 0 1 0-1.4l3-3a1 1 0 1 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0zm-2.2 2.2a3 3 0 0 1 0-4.2l3-3a3 3 0 0 1 4.2 4.2l-1 1a1 1 0 0 1-1.4-1.4l1-1a1 1 0 0 0-1.4-1.4l-3 3a1 1 0 0 0 0 1.4 1 1 0 0 1-1.4 1.4z"
-            fill="currentColor"
-          />
-        </svg>
-        {{ metaCounts.links }} Links
-      </span>
-      <span class="footer-item">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-          <path d="M5 5h14v2H5V5zm0 6h14v2H5v-2zm0 6h8v2H5v-2z" fill="currentColor"/>
-        </svg>
-        {{ metaCounts.checklist }}
-      </span>
     </div>
   </div>
 </template>
@@ -90,9 +64,6 @@ export default Vue.extend({
     priorityTone(): string {
       return `priority-${this.manager.getPriorityTone(this.todo.priority)}`
     },
-    metaCounts(): { comments: number; links: number; checklist: string } {
-      return this.manager.getMetaCounts(this.todo)
-    },
   },
   methods: {
     onDragStart(event: DragEvent): void {
@@ -116,6 +87,7 @@ export default Vue.extend({
   flex-direction: column;
   gap: 10px;
   border: var(--border-soft);
+  cursor: pointer;
 }
 
 .card-header {
@@ -288,21 +260,6 @@ export default Vue.extend({
 .priority-blue {
   color: var(--blue-600);
   background: var(--blue-100);
-}
-
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  font-size: 12px;
-  color: var(--ink-500);
-}
-
-.footer-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .icon {

@@ -7,8 +7,13 @@
         <span class="count">{{ todos.length }}</span>
       </div>
       <div class="column-actions">
-        <button class="icon-btn">+</button>
-        <button class="icon-btn">⋯</button>
+        <button
+          v-if="status === 'todo'"
+          class="icon-btn"
+          @click="$emit('add')"
+        >
+          +
+        </button>
       </div>
     </div>
     <div class="column-body">
@@ -17,6 +22,7 @@
         :key="todo.id"
         :manager="manager"
         :todo="todo"
+        @open="$emit('open', $event)"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
       />

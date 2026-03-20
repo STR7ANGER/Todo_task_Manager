@@ -163,6 +163,8 @@
         <KanbanBoard
           v-if="currentView === 'kanban'"
           :manager="manager"
+          @add="openAdd"
+          @open="openDetails"
           @edit="openEdit"
           @delete="handleDelete"
         />
@@ -172,6 +174,8 @@
           :selected-priority="selectedPriority"
           :selected-assignee="selectedAssignee"
           :sort-key="sortKey"
+          @add="openAdd"
+          @open="openDetails"
           @edit="openEdit"
           @delete="handleDelete"
         />
@@ -185,6 +189,12 @@
         @close="closeModal"
         @saved="handleSaved"
       />
+      <TaskDetailDrawer
+        :manager="manager"
+        :todo="detailTodo"
+        :visible="isDetailOpen"
+        @close="closeDetails"
+      />
     </main>
   </div>
 </template>
@@ -197,6 +207,7 @@ import KanbanBoard from '@/components/todov2/KanbanBoard.vue'
 import ListView from '@/components/todov2/ListView.vue'
 import TodoModal from '@/components/todov2/TodoModal.vue'
 import DropdownSelect from '@/components/todov2/DropdownSelect.vue'
+import TaskDetailDrawer from '@/components/todov2/TaskDetailDrawer.vue'
 
 type ViewMode = 'kanban' | 'list'
 type SortKey = 'dueDate' | 'priority'
@@ -212,6 +223,7 @@ export default Vue.extend({
     ListView,
     TodoModal,
     DropdownSelect,
+    TaskDetailDrawer,
   },
   data(): {
     manager: TodoManager
@@ -222,6 +234,8 @@ export default Vue.extend({
     selectedPriority: PriorityFilter
     selectedAssignee: AssigneeFilter
     sortKey: SortKey
+    detailTodo: Todo | null
+    isDetailOpen: boolean
   } {
     return {
       manager: managerInstance,
@@ -232,6 +246,8 @@ export default Vue.extend({
       selectedPriority: 'all',
       selectedAssignee: 'all',
       sortKey: 'dueDate',
+      detailTodo: null,
+      isDetailOpen: false,
     }
   },
   computed: {
@@ -281,6 +297,14 @@ export default Vue.extend({
       this.modalMode = 'edit'
       this.editingTodo = todo
       this.isModalOpen = true
+    },
+    openDetails(todo: Todo): void {
+      this.detailTodo = todo
+      this.isDetailOpen = true
+    },
+    closeDetails(): void {
+      this.isDetailOpen = false
+      this.detailTodo = null
     },
     closeModal(): void {
       this.isModalOpen = false
