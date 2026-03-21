@@ -3,10 +3,19 @@
     <div class="overlay" @click="$emit('close')"></div>
     <aside class="drawer">
       <div class="drawer-top">
-        <button type="button" class="icon-btn" @click="$emit('close')">×</button>
+        <button type="button" class="icon-btn" @click="$emit('close')">
+          <span class="material-icons-outlined">close</span>
+        </button>
         <div class="actions">
-          <button type="button" class="icon-btn">☆</button>
-          <button type="button" class="icon-btn">⋯</button>
+          <button type="button" class="icon-btn">
+            <span class="material-icons-outlined">schedule</span>
+          </button>
+          <button type="button" class="icon-btn">
+            <span class="material-icons-outlined">star_border</span>
+          </button>
+          <button type="button" class="icon-btn">
+            <span class="material-icons-outlined">more_vert</span>
+          </button>
         </div>
       </div>
 
@@ -14,23 +23,38 @@
 
       <div class="meta-grid">
         <div class="meta-row">
-          <span class="label">Created time</span>
+          <span class="label">
+            <span class="material-icons-outlined label-icon">schedule</span>
+            Created time
+          </span>
           <span class="value">{{ manager.formatDate(todo.createdAt) }}</span>
         </div>
         <div class="meta-row">
-          <span class="label">Status</span>
+          <span class="label">
+            <span class="material-icons-outlined label-icon">track_changes</span>
+            Status
+          </span>
           <span class="pill" :class="statusTone">{{ statusLabel }}</span>
         </div>
         <div class="meta-row">
-          <span class="label">Priority</span>
+          <span class="label">
+            <span class="material-icons-outlined label-icon">flag</span>
+            Priority
+          </span>
           <span class="pill" :class="priorityTone">{{ priorityLabel }}</span>
         </div>
         <div class="meta-row">
-          <span class="label">Due Date</span>
+          <span class="label">
+            <span class="material-icons-outlined label-icon">event</span>
+            Due Date
+          </span>
           <span class="value">{{ manager.formatDate(todo.dueDate) }}</span>
         </div>
         <div class="meta-row">
-          <span class="label">Assignee</span>
+          <span class="label">
+            <span class="material-icons-outlined label-icon">person</span>
+            Assignee
+          </span>
           <span class="assignee">{{ todo.assignee }}</span>
         </div>
       </div>
@@ -39,6 +63,7 @@
         <div class="label">Project Description</div>
         <p>{{ todo.description }}</p>
       </div>
+
     </aside>
   </div>
 </template>
@@ -97,14 +122,14 @@ export default Vue.extend({
 
 .drawer {
   position: absolute;
-  top: 24px;
-  right: 24px;
-  bottom: 24px;
-  width: min(460px, 92vw);
+  top: 18px;
+  right: 18px;
+  bottom: 18px;
+  width: min(520px, 92vw);
   background: var(--surface);
-  border-radius: 20px;
+  border-radius: 22px;
   box-shadow: var(--shadow-soft);
-  padding: 20px 22px;
+  padding: 18px 22px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -115,6 +140,8 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: var(--border-soft);
+  padding-bottom: 12px;
 }
 
 .icon-btn {
@@ -132,7 +159,7 @@ export default Vue.extend({
 
 .title {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   color: var(--ink-900);
 }
 
@@ -153,6 +180,17 @@ export default Vue.extend({
 .label {
   color: var(--ink-500);
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-icon {
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+  color: var(--ink-500);
+  font-size: 18px;
 }
 
 .value {
@@ -213,4 +251,5 @@ export default Vue.extend({
   font-size: 13px;
   line-height: 1.5;
 }
+
 </style>

@@ -21,12 +21,7 @@
     </div>
     <div class="meta-row">
       <div class="date" :class="{ overdue: manager.isOverdue(todo) }">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-          <path
-            d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 6H5v12h14V8z"
-            fill="currentColor"
-          />
-        </svg>
+        <span class="material-icons-outlined icon" aria-hidden="true">event</span>
         {{ manager.formatDate(todo.dueDate) }}
       </div>
       <span class="priority" :class="priorityTone">{{ priorityLabel }}</span>

@@ -4,9 +4,9 @@
       <div>
         <h2>Daily Back-End Task</h2>
         <div class="head-meta">
-          <span><svg viewBox="0 0 24 24" class="icon"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.31 0-6 1.34-6 3v3h12v-3c0-1.66-2.69-3-6-3z" fill="currentColor"/></svg> Developer Team</span>
-          <span><svg viewBox="0 0 24 24" class="icon"><path d="M12 2l2.4 6h6.6l-5.3 3.9 2 6.1-5.7-4.1-5.7 4.1 2-6.1L3 8h6.6L12 2z" fill="currentColor"/></svg> Important</span>
-          <span><svg viewBox="0 0 24 24" class="icon"><path d="M7 5h10v2H7V5zm0 6h10v2H7v-2zm0 6h6v2H7v-2z" fill="currentColor"/></svg> 11 Task</span>
+          <span><span class="material-icons-outlined icon">group</span> Developer Team</span>
+          <span><span class="material-icons-outlined icon">star</span> Important</span>
+          <span><span class="material-icons-outlined icon">list</span> 11 Task</span>
         </div>
       </div>
       <button type="button" class="add-task" @click="$emit('add')">

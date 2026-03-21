@@ -18,6 +18,7 @@ export default Vue.extend({
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
 * {
   box-sizing: border-box;
 }
@@ -27,6 +28,12 @@ body {
   background: #f5f6fa;
   font-family: 'Manrope', sans-serif;
   color: #2b2f3a;
+}
+
+.material-icons-outlined {
+  font-size: 18px;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 #app {
