@@ -14,6 +14,7 @@ A Vue 2 Options API + TypeScript assessment project featuring a Todo Task Manage
 - Strict typing (no `any` in the codebase)
 
 ## Project Structure
+
 ```
 src/
   BLL/todoV2/
